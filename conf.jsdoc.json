@@ -1,0 +1,9 @@
+{
+    "opts": {
+      "destination": "./docs/"
+    },
+    "source": {
+      "include": ["./","./README.md"],
+      "exclude": ["./node_modules/","./docs/"]
+    }
+  }
