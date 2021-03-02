@@ -6,4 +6,4 @@
       "include": ["./","./README.md"],
       "exclude": ["./node_modules/","./docs/"]
     }
-  }
+}
