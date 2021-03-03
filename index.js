@@ -10,8 +10,11 @@ const fs = require("fs");
  */
 const cheerio = require("cheerio");
 
-// list all six countries
-let countries = [
+/** Contain of all six countries
+    @constant
+    @type {string|Array}
+ */
+const countries = [
   "chinese",
   "japanese",
   "malaysian",
@@ -22,16 +25,20 @@ let countries = [
 
 let raw_html = null;
 let $ = null;
+/** Contain a list of culture data of six countries
+    @type {string|Array}
+ */
 let countries_culture = [];
 
 for (let i = 0; i < countries.length; i++) {
   raw_html = fs.readFileSync(`data/raw/${countries[i]}-culture.html`);
 
   $ = cheerio.load(raw_html);
-  // An object to store country culture data
+  /** Hold a single country culture data
+    @type {object}
+ */
   let country_culture = {};
-  // Get the title
-  let country_name = $("h1").text().replace(/-/gm, "");
+  let country_name = $("h1").text().replace(/-/gm, ""); // Get the title
   country_culture[country_name] = [];
   $(".text-content")
     .find(".culture-subheading")
@@ -64,7 +71,7 @@ fs.writeFileSync(
   @function
   @param {object} element A Cheerio parent element
   @param {string} selector A CSS selector for child elements
-  @returns {Array} The child's text content
+  @returns {string|Array} An array to hold a list of the child's text content
 */
 
 function extractText(element, selector) {
