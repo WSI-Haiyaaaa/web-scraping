@@ -10,30 +10,51 @@ const fs = require("fs");
  */
 const cheerio = require("cheerio");
 
-let raw_html = fs.readFileSync("data/raw/chinese-culture.html");
-let $ = cheerio.load(raw_html);
-// An object to store country culture data
-let country_culture = {};
-// Get the country name
-let country_name = $("h1").text().replace(/-/gm, "");
-country_culture[country_name] = [];
-$(".text-content")
-  .find(".culture-subheading")
-  .each(function () {
-    let data = {};
-    data["type"] = $(this).text(); // Get Dos or Donts
-    country_culture[country_name].push(data);
-  });
+// list all six countries
+let countries = [
+  "chinese",
+  "japanese",
+  "malaysian",
+  "singaporean",
+  "south-korean",
+  "thai",
+];
 
-$(".text-content")
-  .find("ul")
-  .each(function (index) {
-    country_culture[country_name][index]["list"] = extractText($(this), "li"); // Add bullet points
-  });
+let raw_html = null;
+let $ = null;
+let countries_culture = [];
 
-console.log(JSON.stringify(country_culture));
-// Store parsed data into json file
-fs.writeFileSync("data/chinese-culture.json", JSON.stringify(country_culture));
+for (let i = 0; i < countries.length; i++) {
+  raw_html = fs.readFileSync(`data/raw/${countries[i]}-culture.html`);
+
+  $ = cheerio.load(raw_html);
+  // An object to store country culture data
+  let country_culture = {};
+  // Get the title
+  let country_name = $("h1").text().replace(/-/gm, "");
+  country_culture[country_name] = [];
+  $(".text-content")
+    .find(".culture-subheading")
+    .each(function () {
+      let data = {};
+      data["type"] = $(this).text(); // Get Dos or Donts
+      country_culture[country_name].push(data);
+    });
+
+  $(".text-content")
+    .find("ul")
+    .each(function (index) {
+      country_culture[country_name][index]["list"] = extractText($(this), "li"); // Add bullet points
+    });
+
+  countries_culture.push(country_culture);
+}
+
+// Write data into json file
+fs.writeFileSync(
+  `data/countries_culture.json`,
+  JSON.stringify(countries_culture)
+);
 
 /*
   Utility Functions
