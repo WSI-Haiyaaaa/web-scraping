@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "docs": "jsdoc -c conf.jsdoc.json"
+    "docs": "jsdoc -c conf.jsdoc.json",
+    "linter": "npx eslint -c conf.node.eslint.json app.js ./",
   },
   "repository": {
     "type": "git",
