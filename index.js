@@ -19,7 +19,7 @@ const countries = [
   "japan",
   "malaysia",
   "singapore",
-  "south-korea",
+  "south_korea",
   "thailand",
 ];
 
