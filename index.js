@@ -15,53 +15,48 @@ const cheerio = require("cheerio");
     @type {string|Array}
  */
 const countries = [
-  "chinese",
-  "japanese",
-  "malaysian",
-  "singaporean",
-  "south-korean",
-  "thai",
+  "china",
+  "japan",
+  "malaysia",
+  "singapore",
+  "south_korea",
+  "thailand",
 ];
 
 let raw_html = null;
 let $ = null;
-/** Contain a list of culture data of six countries
-    @type {string|Array}
- */
-let countries_culture = [];
+/** Hold all countries' data
+    @type {object}
+*/
+let countries_culture = {};
 
 for (let i = 0; i < countries.length; i++) {
-  raw_html = fs.readFileSync(`data/raw/${countries[i]}-culture.html`);
+  raw_html = fs.readFileSync(`data/raw/${countries[i]}.html`);
 
   $ = cheerio.load(raw_html);
-  /** Hold a single country culture data
-    @type {object}
- */
-  let country_culture = {};
-  let country_name = $("h1").text().replace(/-/gm, ""); // Get the title
-  country_culture[country_name] = [];
+
+  let country_name = countries[i];
+  countries_culture[country_name] = [];
   $(".text-content")
     .find(".culture-subheading")
     .each(function () {
       let data = {};
       data["type"] = $(this).text(); // Get Dos or Donts
-      country_culture[country_name].push(data);
+      countries_culture[country_name].push(data);
     });
 
   $(".text-content")
     .find("ul")
     .each(function (index) {
-      country_culture[country_name][index]["list"] = extractText($(this), "li"); // Add bullet points
+      countries_culture[country_name][index]["list"] = extractText(
+        $(this),
+        "li"
+      ); // Add bullet points
     });
-
-  countries_culture.push(country_culture);
 }
 
 // Write data into json file
-fs.writeFileSync(
-  `data/countries_culture.json`,
-  JSON.stringify(countries_culture)
-);
+fs.writeFileSync(`data/dos_and_donts.json`, JSON.stringify(countries_culture));
 
 /*
   Utility Functions
