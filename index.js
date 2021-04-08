@@ -9,6 +9,25 @@ const fs = require("fs");
     @type {object}
  */
 const cheerio = require("cheerio");
+/** Require utility functions
+    @constant
+    @type {object}
+ */
+const utils = require("./lib/utils.js");
+/** Require MongoDB connection
+    @constant
+    @type {object}
+ */
+const mdb = require("./db/connect.js");
+
+// Establish db connection
+mdb.connect();
+
+/** Contain of documents
+    @constant
+    @type {string|Array}
+ */
+const documents_array = [];
 
 /** Contain of all six countries
     @constant
@@ -25,54 +44,28 @@ const countries = [
 
 let raw_html = null;
 let $ = null;
-/** Hold all countries' data
-    @type {object}
-*/
-let countries_culture = {};
 
 for (let i = 0; i < countries.length; i++) {
+  let storage = {};
   raw_html = fs.readFileSync(`data/raw/${countries[i]}.html`);
 
   $ = cheerio.load(raw_html);
 
-  let country_name = countries[i];
-  countries_culture[country_name] = [];
-  $(".text-content")
-    .find(".culture-subheading")
-    .each(function () {
-      let data = {};
-      data["type"] = $(this).text(); // Get Dos or Donts
-      countries_culture[country_name].push(data);
-    });
+  storage["countryName"] = countries[i];
 
+  // Add bullet points
   $(".text-content")
     .find("ul")
     .each(function (index) {
-      countries_culture[country_name][index]["list"] = extractText(
-        $(this),
-        "li"
-      ); // Add bullet points
+      if (index === 0) {
+        storage["Do's"] = utils.extractText($(this), "li");
+      }
+      if (index === 1) {
+        storage["Don'ts"] = utils.extractText($(this), "li");
+      }
     });
+  documents_array.push(storage);
 }
 
-// Write data into json file
-fs.writeFileSync(`data/dos_and_donts.json`, JSON.stringify(countries_culture));
-
-/*
-  Utility Functions
-*/
-
-/** Extract simple text from the child elements (li) of a parent element (ul).
-  @function
-  @param {object} element A Cheerio parent element
-  @param {string} selector A CSS selector for child elements
-  @returns {string|Array} An array to hold a list of the child's text content
-*/
-
-function extractText(element, selector) {
-  let list = [];
-  element.find(selector).each(function () {
-    list.push($(this).text());
-  });
-  return list;
-}
+// Insert data into DB
+utils.insertManyDocuments(documents_array);
