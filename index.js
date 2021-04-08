@@ -9,16 +9,16 @@ const fs = require("fs");
     @type {object}
  */
 const cheerio = require("cheerio");
+/** Require utility functions
+    @constant
+    @type {object}
+ */
+const utils = require("./lib/utils.js");
 /** Require MongoDB connection
     @constant
     @type {object}
  */
 const mdb = require("./db/connect.js");
-/** Require MongoDB model
-    @constant
-    @type {object}
-*/
-const DosAndDontsModel = require("./db/models/dos_and_donts_schema");
 
 // Establish db connection
 mdb.connect();
@@ -44,9 +44,6 @@ const countries = [
 
 let raw_html = null;
 let $ = null;
-/** Hold all countries' data
-    @type {object}
-*/
 
 for (let i = 0; i < countries.length; i++) {
   let storage = {};
@@ -61,44 +58,14 @@ for (let i = 0; i < countries.length; i++) {
     .find("ul")
     .each(function (index) {
       if (index === 0) {
-        storage["Do's"] = extractText($(this), "li");
+        storage["Do's"] = utils.extractText($(this), "li");
       }
       if (index === 1) {
-        storage["Don'ts"] = extractText($(this), "li");
+        storage["Don'ts"] = utils.extractText($(this), "li");
       }
     });
   documents_array.push(storage);
 }
 
-insertManyDocuments(documents_array);
-
-/*
-  Utility Functions
-*/
-
-/** Extract simple text from the child elements (li) of a parent element (ul).
-  @function
-  @param {object} element A Cheerio parent element
-  @param {string} selector A CSS selector for child elements
-  @returns {string|Array} An array to hold a list of the child's text content
-*/
-function extractText(element, selector) {
-  let list = [];
-  element.find(selector).each(function () {
-    list.push($(this).text());
-  });
-  return list;
-}
-
-/** Insert mutiple documents into MongoDB
-  @function
-*/
-function insertManyDocuments(array) {
-  DosAndDontsModel.insertMany(array, function (err) {
-    if (err) {
-      return console.error(err);
-    } else {
-      console.log("Multiple documents inserted to Collection");
-    }
-  });
-}
+// Insert data into DB
+utils.insertManyDocuments(documents_array);
