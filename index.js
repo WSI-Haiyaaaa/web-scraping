@@ -58,10 +58,10 @@ for (let i = 0; i < countries.length; i++) {
     .find("ul")
     .each(function (index) {
       if (index === 0) {
-        storage["Do's"] = utils.extractText($(this), "li");
+        storage["Dos"] = utils.extractText($(this), "li");
       }
       if (index === 1) {
-        storage["Don'ts"] = utils.extractText($(this), "li");
+        storage["Donts"] = utils.extractText($(this), "li");
       }
     });
   documents_array.push(storage);
